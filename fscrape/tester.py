@@ -83,13 +83,13 @@ class TwitterSubscriber:
 		self.topic_name = str(topic_name)
 		self.msg_type = msg_type
 		self.parent_window = window
-		self.window = QtGui.QWidget()
+		self.window = QtGui.QWidget(self.parent_window)
 		self.raw_output_file = "raw_"+self.topic_name+".txt"
 		self.output_file = self.topic_name+".txt"
 		self.tab_layout = QtGui.QGridLayout()
 		self.twitter_call_limit = []
 		if(self.window):
-			self.scroll = QtGui.QScrollArea()
+			self.scroll = QtGui.QScrollArea(self.parent_window)
 			self.tab_layout = QtGui.QGridLayout()
 
 		pub.subscribe(self.listener, self.topic_name)
@@ -108,7 +108,7 @@ class TwitterSubscriber:
 				input_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
 				output_box = QtGui.QTextEdit(self.window)
 				output_box.setReadOnly(True)
-				output_box.setText(data[row].)
+				output_box.setText(data[row].get_message())
 				self.tab_layout.addWidget(input_box,row,1)
 				self.tab_layout.addWidget(output_box,row,0)
 			
