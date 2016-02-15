@@ -18,12 +18,10 @@ class TwitterPublisher:
 		
 	def get_data(self, count):
 		search_link = self.search_link_base + self.search_term + "&count=" + str(count)
-		print(search_link)
 		output = self.client.request(search_link)
 		msg_array = []
 		msg_array.append(get_rate(self))
 		for x in range(len(output.get('statuses'))):
-			print(x)
 			msg = StandardMessage()
 			msg.mentions = output.get('statuses')[x]['entities']['user_mentions']
 			msg.shares = str(output.get('statuses')[x]['retweet_count'])
