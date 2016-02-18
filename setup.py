@@ -7,12 +7,10 @@ setup(
 	author = 'Peter Travers',
 	author_email = 'peter.travers@abdn.ac.uk',
 	license = 'GPLv3',
-	version = '0.0.1'
-	url='https://github.com/ptravers/fsc'
+	version = '0.0.1',
+	url='https://github.com/ptravers/fsc',
 	install_requires = [
 		'application_only_auth',
-		'json',
-		'pubsub',
-		'PyQt4'
+		'pubsub'
 	]
 )

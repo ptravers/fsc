@@ -76,20 +76,7 @@ class TwitterPublisher:
 	def run(self):
 		msg = self.get_data(400)
 		pub.sendMessage(self.search_term, arg1=msg)
-
-class fscWindow(QMainWindow):
-	
-	def __init__(self):
-		super.__init__()
-		self.setWindowTitle('Fscrape')
-	
-	
-def main():
-	fscraper = QApplication(sys.argv)
-	primary_window = fscWindow()
-	primary_window.show()
-	primary_window.raise_()
-	fscraper.exec_()
+		
 
 class TwitterSubscriber:
 	def __init__(self, msg_type, topic_name, window=None):
@@ -119,9 +106,10 @@ class TwitterSubscriber:
 			for row in range(len(data)):
 				input_box = QtGui.QLineEdit()
 				input_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
-				output_box = QtGui.QLabel(self.window)
-				#output_box.setReadOnly(True)
-				output_box.setText(data[row].get_message())
+				output_box = QtGui.QTextEdit(self.window)
+				output_box.setReadOnly(True)
+				print(QtCore.QString(data[row].comment).toUtf8())
+				output_box.setText(data[row].comment)
 				self.tab_layout.addWidget(input_box,row,1)
 				self.tab_layout.addWidget(output_box,row,0)
 			
@@ -140,7 +128,7 @@ class TwitterSubscriber:
 	
 	def listener(self, arg1):
 		self.twitter_call_limit.append(arg1[0])
-		arg1 = arg1[1:]
+		arg1 = arg1[1:]    	
 		self.update_frame(arg1)
 		
 		
