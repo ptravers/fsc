@@ -10,7 +10,6 @@ setup(
 	version = '0.0.1',
 	url='https://github.com/ptravers/fsc',
 	install_requires = [
-		'application_only_auth',
 		'pubsub'
 	]
 )

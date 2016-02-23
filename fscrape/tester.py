@@ -25,12 +25,14 @@ class StandardMessage():
 		
 	def get_message(self):
 		return js.dumps(self.__dict__, sort_keys=True, indent=4, separators=(',', ':'))
+	def get_comment(self):
+		return self.comment
 
 		
-class Main_Gui():
+class Main_Gui:
 	def __init__(self):
 		app	= QtGui.QApplication(sys.argv)
-		tabs	= QtGui.QTabWidget()
+		tabs = QtGui.QTabWidget()
 		tabs.setWindowTitle("fsc")
 		tab	= QtGui.QWidget()
 		sub = TwitterSubscriber('standard', 'Trump', tab)
@@ -64,6 +66,7 @@ class TwitterPublisher:
 			msg.hashtags = output.get('statuses')[x]['entities']['hashtags']
 			msg.url = self.link_base + output.get('statuses')[x]['user']['screen_name'] + '/status/' + msg.id
 			msg.comment = str(output.get('statuses')[x]['text'])
+			output.get('statuses')[x]['text']
 			msg.shared = str(output.get('statuses')[x]['retweeted'])
 			msg_array.append(msg)
 		return msg_array
@@ -74,14 +77,43 @@ class TwitterPublisher:
 	
 	#This should be placed in the Parent class should be passed a message a string and the publisher object
 	def run(self):
-		msg = self.get_data(400)
+		msg = self.get_data(100)
 		pub.sendMessage(self.search_term, arg1=msg)
 
-class fscWindow(QMainWindow):
+class mainTab(QtGui.QWidget):
+	
+	def __init__(self):
+		super.__init__()
+		
+		
+class fscWindow(QtGui.QTabWidget):
 	
 	def __init__(self):
 		super.__init__()
 		self.setWindowTitle('Fscrape')
+	
+	def add_tab(self, tab, tab_name):
+		self.addTab(tab, tab_name)
+	
+
+class tabDropDown(QtGui.QWidget):
+	def __init__(self, publishers, subscribers):
+		super.__init__()
+		#add code to create drop down showing all publishers and subscribers that can be used.
+
+class fscEntry(QtGui.QWidget):
+	def __init__(self, data_object):
+		super.__init__()
+		self.layout = QHBoxLayout()
+		self.data = data_object
+
+class fscTab(QtGui.QWidget):
+	def __init__(self, search_term, message_type, layout=None):
+		super.__init__()
+		if(not layout):
+			self.primary_layout =  QVBoxLayout()
+			self.primary_layout.addWidget
+			
 	
 	
 def main():
@@ -117,26 +149,28 @@ class TwitterSubscriber:
 			layout = QtGui.QVBoxLayout(self.parent_window)
 			layout.addWidget(self.scroll)
 			for row in range(len(data)):
-				input_box = QtGui.QLineEdit()
+				input_box = QtGui.QTextEdit()
 				input_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
-				output_box = QtGui.QLabel(self.window)
-				#output_box.setReadOnly(True)
-				output_box.setText(data[row].get_message())
+				output_box = QtGui.QTextEdit(self.window)
+				output_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
+				output_box.setReadOnly(True)
+				output_box.insertPlainText("start " + str(data[row].get_comment())+ " end")
+				self.update_file(data[row].comment, 'test.txt')
 				self.tab_layout.addWidget(input_box,row,1)
 				self.tab_layout.addWidget(output_box,row,0)
-			
 
 	def read_raw_file(self):
 		self.read_file(self.raw_output_file)
 	
 	def read_file(self, file):
-		if(os.path.exists('data/'+topic_name)):
+		if(os.path.exists('data/'+file)):
 			with open(os.path.join('data' , '/'+file), encoding='utf-8') as f:
 				return js.load(f)
 	
 	def update_file(self, msg, file):
-		with open(file, 'w', encoding='utf-8') as f:
+		with open('data/'+file, 'w', encoding='utf-8') as f:
 			js.dump(msg, f)
+			print('update file run')
 	
 	def listener(self, arg1):
 		self.twitter_call_limit.append(arg1[0])
@@ -150,7 +184,7 @@ class TwitterSubscriber:
 app	= QtGui.QApplication(sys.argv)
 tabs	= QtGui.QTabWidget()
 tabs.setWindowTitle("fsc")
-tab	= QtGui.QWidget()
+tab	= QtGui.QWidget(tabs)
 sub = TwitterSubscriber('standard', 'Trump', tab)
 pub = TwitterPublisher('standard', 'Trump')
 tabs.addTab(sub.parent_window, sub.topic_name)

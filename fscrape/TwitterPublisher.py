@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from pubsub import pub
 import json as js
 from application_only_auth import Client
 from .StandardMessage import StandardMessage
