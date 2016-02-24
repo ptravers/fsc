@@ -1,5 +1,6 @@
 build/lib/fscrape/tester.py
 build/lib/fscrape/__init__.py
+build/
 fscrape.egg-info/dependency_links.txt
 fscrape.egg-info/SOURCES.txt
 fscrape/subscribers/__pycache__/__init__.cpython-34.pyc
