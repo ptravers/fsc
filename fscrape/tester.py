@@ -128,18 +128,19 @@ class TwitterSubscriber:
 		self.topic_name = str(topic_name)
 		self.msg_type = msg_type
 		self.parent_window = window
-		self.window = QtGui.QWidget(self.parent_window)
-		self.raw_output_file = "raw_"+self.topic_name+".txt"
-		self.output_file = self.topic_name+".txt"
 		self.tab_layout = QtGui.QGridLayout()
 		self.twitter_call_limit = []
-		if(self.window):
+		self.text_input_areas = []
+		self.raw_data= None
+		if(self.parent_window):
+			self.window = QtGui.QWidget(self.parent_window)
 			self.scroll = QtGui.QScrollArea(self.parent_window)
 			self.tab_layout = QtGui.QGridLayout()
 
 		pub.subscribe(self.listener, self.topic_name)
 	
-	def update_frame(self, data):
+	def update_frame(self):
+		
 		if(self.window):
 			#current_file = read_file(output_file)
 			self.tab_layout.setSpacing(3)
@@ -154,8 +155,8 @@ class TwitterSubscriber:
 				output_box = QtGui.QTextEdit(self.window)
 				output_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
 				output_box.setReadOnly(True)
-				output_box.insertPlainText("start " + str(data[row].get_comment())+ " end")
-				self.update_file(data[row].comment, 'test.txt')
+				output_box.insertHtml(str(data[row].get_comment()))
+				self.text_input_areas.append(output_box)
 				self.tab_layout.addWidget(input_box,row,1)
 				self.tab_layout.addWidget(output_box,row,0)
 
@@ -167,15 +168,16 @@ class TwitterSubscriber:
 			with open(os.path.join('data' , '/'+file), encoding='utf-8') as f:
 				return js.load(f)
 	
-	def update_file(self, msg, file):
+	def update_file(self, file, msg=self.raw_data):
 		with open('data/'+file, 'w', encoding='utf-8') as f:
 			js.dump(msg, f)
-			print('update file run')
 	
 	def listener(self, arg1):
 		self.twitter_call_limit.append(arg1[0])
 		arg1 = arg1[1:]
-		self.update_frame(arg1)
+		self.raw_data = arg1
+		update_file()
+		self.update_frame()
 		
 		
 

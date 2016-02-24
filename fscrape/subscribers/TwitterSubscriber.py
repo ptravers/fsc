@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from pubsub import pub
 import json as js
+from PyQt4 import QtGui,QtCore
 
 class TwitterSubscriber:
 	def __init__(self, msg_type, topic_name, window=None):

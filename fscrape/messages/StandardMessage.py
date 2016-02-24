@@ -12,6 +12,8 @@ class StandardMessage():
 		self.mentions = "null"
 		self.shared = "null"
 		self.id = "null"
+		self.followers = "null"
+		self.following = "null"
 		
 	def get_message(self):
 		output = js.dumps(self.__dict__)
