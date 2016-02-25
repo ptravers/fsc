@@ -168,6 +168,9 @@ class TwitterSubscriber:
 			with open(os.path.join('data' , '/'+file), encoding='utf-8') as f:
 				return js.load(f)
 	
+	def output_all(self):
+		
+	
 	def update_file(self, file, msg=self.raw_data):
 		with open('data/'+file, 'w', encoding='utf-8') as f:
 			js.dump(msg, f)
@@ -177,7 +180,7 @@ class TwitterSubscriber:
 		arg1 = arg1[1:]
 		self.raw_data = arg1
 		update_file()
-		self.update_frame()
+		self.update_frame(self.topic_name+)
 		
 		
 

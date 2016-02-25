@@ -5,3 +5,4 @@ fscrape.egg-info/dependency_links.txt
 fscrape.egg-info/SOURCES.txt
 fscrape/subscribers/__pycache__/__init__.cpython-34.pyc
 fscrape/messages/__pycache__/StandardMessage.cpython-34.pyc
+*.pyc
