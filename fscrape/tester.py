@@ -7,6 +7,7 @@ from PyQt4 import QtCore
 import sys
 import os
 import datetime
+import glob
 
 
 API_KEY, API_SECRET = ('5jquzflYqTUNMNqmpdxPUr4Si', 'RE3tNfpjyhNB5IJatzLiDnoonEw7i2OgWz0o5kSCbS2egllDBv')
@@ -15,13 +16,15 @@ class StandardMessage():
 	def __init__(self):
 		self.shares = "null"
 		self.likes = "null"
-		self.nodes = []
+		self.node = "null"
 		self.comment = "null"
 		self.url = "null"
 		self.hashtags = "null"
 		self.mentions = "null"
 		self.shared = "null"
 		self.id = "null"
+		self.followers = "null"
+		self.following = "null"
 		
 	def get_message(self):
 		return js.dumps(self.__dict__, sort_keys=True, indent=4, separators=(',', ':'))
@@ -44,7 +47,7 @@ class TwitterPublisher:
 		self.client = Client(API_KEY, API_SECRET)
 		self.message_type = message
 		self.search_term = term
-		self.topic_name = term + "_" + str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":","_").split(".")[0]
+
 		self.search_link_base = 'https://api.twitter.com/1.1/search/tweets.json?q='
 		self.link_base = 'https://twitter.com/'
 		self.run()
@@ -112,7 +115,7 @@ class fscTab(QtGui.QWidget):
 		super.__init__()
 		if(not layout):
 			self.primary_layout =  QVBoxLayout()
-			self.primary_layout.addWidget
+			self.primary_layout.addWidget()
 			
 	
 	
@@ -128,19 +131,22 @@ class TwitterSubscriber:
 		self.topic_name = str(topic_name)
 		self.msg_type = msg_type
 		self.twitter_call_limit = []
+		self.raw_file_name = "raw_" + self.name_file(topic_name)
+		self.file_name = self.name_file(topic_name)
 		self.text_input_areas = []
-		self.raw_data= None
+		self.current_data = []
+		self.raw_data= []
 		if(self.parent_window):
 			self.window = QtGui.QWidget(self.parent_window)
 			self.scroll = QtGui.QScrollArea(self.parent_window)
-			self.tab_layout = QtGui.QGridLayout()
+			self.tab_layout = QtGui.QVBoxLayout()
 
 		pub.subscribe(self.listener, self.topic_name)
 	
 	def update_frame(self):
 		
 		if(self.window):
-			#current_file = read_file(output_file)
+			update_file()
 			self.tab_layout.setSpacing(3)
 			self.window.setLayout(self.tab_layout)
 			self.scroll.setWidget(self.window)
@@ -154,50 +160,55 @@ class TwitterSubscriber:
 				output_box = QtGui.QTextEdit(self.window)
 				output_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
 				output_box.setReadOnly(True)
-				output_box.insertPlainText(str(data[row].get_comment()))
+				output_box.insertPlainText(str(data[row]))
 				
 				self.text_input_areas.append(output_box)
 				
 				self.tab_layout.addWidget(input_box,row,1)
 				self.tab_layout.addWidget(output_box,row,0)
 
-	def read_raw_file(self):
-		self.read_file(self.raw_output_file)
-	
+
 	def get_data_from_UI(self)
 		output_areas = []
 		for box in self.text_input_areas:
 			output_areas.append(box.toPlainText())
 		return output_areas
-		
+
 	def read_file(self, file):
+		#file = glob.glob(file+'*.json')
 		if(os.path.exists('data/'+file)):
-			with open(os.path.join('data' , '/'+file), encoding='utf-8') as f:
+			with open(os.path.join('data/' , file), encoding='utf-8') as f:
 				return js.load(f)
-	
+		else :
+			print("There is no /data directory available to fsc in the working directory or the required file has been deleted.")
+
 	def create_output(self, msg_array):
 		ui_data = self.get_data_from_UI()
 		x = 0
-		msg_file = '"' + str(self.msg_type) + '_array":['
+		msg_file = []
 		for msg in msg_array:
 			msg.node = ui_data[x]
 			x += 1
-			msg_file += msg.get_message()
-		msg_file += "]"
+			msg_file.append(msg.__dict__)
 		return msg_file
+
 	def update_file(self, file, msg_array=self.raw_data):
-		msg_array = create_output(msg_array)
+		if(not msg_array === self.raw_data):	
+			msg_array = create_output(msg_array)
 		with open('data/'+file, 'w', encoding='utf-8') as f:
 			js.dump(msg_array, f)
+	
+	def name_file(self, primary_name):
+		return str(primary_name) + "_" + str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":","_").split(".")[0] + ".json"
 	
 	def listener(self, arg1):
 		self.twitter_call_limit.append(arg1[0])
 		arg1 = arg1[1:]
-		self.raw_data = arg1
-		update_file()
-		self.update_frame(self.topic_name+)
-		
-		
+		self.raw_data += arg1
+		self.current_data += arg1
+		self.update_file(self.raw_file_name)
+		self.update_frame()
+
 
 
 

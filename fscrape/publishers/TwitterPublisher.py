@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import json as js
-from application_only_auth import Client
+from .TwitterClient	lient import Client
 from messages.StandardMessage import StandardMessage
 
 API_KEY, API_SECRET = ('5jquzflYqTUNMNqmpdxPUr4Si', 'RE3tNfpjyhNB5IJatzLiDnoonEw7i2OgWz0o5kSCbS2egllDBv')
