@@ -127,8 +127,6 @@ class TwitterSubscriber:
 	def __init__(self, msg_type, topic_name, window=None):
 		self.topic_name = str(topic_name)
 		self.msg_type = msg_type
-		self.parent_window = window
-		self.tab_layout = QtGui.QGridLayout()
 		self.twitter_call_limit = []
 		self.text_input_areas = []
 		self.raw_data= None
@@ -152,28 +150,45 @@ class TwitterSubscriber:
 			for row in range(len(data)):
 				input_box = QtGui.QTextEdit()
 				input_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
+				
 				output_box = QtGui.QTextEdit(self.window)
 				output_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
 				output_box.setReadOnly(True)
-				output_box.insertHtml(str(data[row].get_comment()))
+				output_box.insertPlainText(str(data[row].get_comment()))
+				
 				self.text_input_areas.append(output_box)
+				
 				self.tab_layout.addWidget(input_box,row,1)
 				self.tab_layout.addWidget(output_box,row,0)
 
 	def read_raw_file(self):
 		self.read_file(self.raw_output_file)
 	
+	def get_data_from_UI(self)
+		output_areas = []
+		for box in self.text_input_areas:
+			output_areas.append(box.toPlainText())
+		return output_areas
+		
 	def read_file(self, file):
 		if(os.path.exists('data/'+file)):
 			with open(os.path.join('data' , '/'+file), encoding='utf-8') as f:
 				return js.load(f)
 	
-	def output_all(self):
-		
-	
-	def update_file(self, file, msg=self.raw_data):
+	def create_output(self, msg_array):
+		ui_data = self.get_data_from_UI()
+		x = 0
+		msg_file = '"' + str(self.msg_type) + '_array":['
+		for msg in msg_array:
+			msg.node = ui_data[x]
+			x += 1
+			msg_file += msg.get_message()
+		msg_file += "]"
+		return msg_file
+	def update_file(self, file, msg_array=self.raw_data):
+		msg_array = create_output(msg_array)
 		with open('data/'+file, 'w', encoding='utf-8') as f:
-			js.dump(msg, f)
+			js.dump(msg_array, f)
 	
 	def listener(self, arg1):
 		self.twitter_call_limit.append(arg1[0])
@@ -187,29 +202,24 @@ class TwitterSubscriber:
 
 
 app	= QtGui.QApplication(sys.argv)
+
 tabs	= QtGui.QTabWidget()
+
 tabs.setWindowTitle("fsc")
+
 tab	= QtGui.QWidget(tabs)
+
 sub = TwitterSubscriber('standard', 'Trump', tab)
 pub = TwitterPublisher('standard', 'Trump')
+
 tabs.addTab(sub.parent_window, sub.topic_name)
-#vBoxlayout	= QtGui.QVBoxLayout()
-#vBoxlayout.addWidget(pushButton1)
-#vBoxlayout.addWidget(pushButton2)
 
 #Resize width and height
 tabs.resize(600, 600)
     
 #Move QTabWidget to x:300,y:300
 tabs.move(300, 300)
-    
-#Set Layout for Third Tab Page
-#tab3.setLayout(vBoxlayout)   
-    
-#tabs.addTab(tab1,"Tab 1")
-#tabs.addTab(tab2,"Tab 2")
-#tabs.addTab(tab3,"Tab 3")
-    
+  
 tabs.show()
     
 sys.exit(app.exec_())
