@@ -3,7 +3,7 @@ Social Media Project Tool
 
 The project is currently in beta and highly breakable.
 
-The project should be compatible with python >=2.7.9
+The project should be compatible with python >=3.4.2
 
 It was natively built in 3.4
 
