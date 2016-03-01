@@ -95,12 +95,14 @@ class fscWindow(QtGui.QTabWidget):
 		self.setWindowTitle('FSC')
 		self.createMainTab()
 	
-	def add_tab(self, tab, tab_name):
-		self.addTab(tab, tab_name)
 		
 	def create_main_tab(self):
 		layout = QtGui.QVBoxLayout()
-		search_box = 
+		search_box = QWidget(self)
+		search_box_layout = QHBoxLayout(search_box)
+		text_entry = QLineEdit(search_box)
+		
+		search_box_layout.addWidget(text_entry)
 		
 	
 
