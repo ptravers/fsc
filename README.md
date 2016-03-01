@@ -17,7 +17,7 @@ The project is licenced under the GPLv3 licence. No support is provided.
 
 Please run the following command in a bash terminal
 ```bash
-sudo apt-get install python-sip python-qt4
+sudo apt-get install python-sip python-qt4 python-setuptools
 ```
 
 ####Windows
