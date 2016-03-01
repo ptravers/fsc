@@ -3,7 +3,7 @@ Social Media Project Tool
 
 The project is currently in beta and highly breakable.
 
-The project should be compatible with python >=2.7.9
+The project should be compatible with python >=3.4.2
 
 It was natively built in 3.4
 
@@ -17,7 +17,7 @@ The project is licenced under the GPLv3 licence. No support is provided.
 
 Please run the following command in a bash terminal
 ```bash
-sudo apt-get install python-sip python-qt4
+sudo apt-get install python3-sip python3-qt4 python3-setuptools
 ```
 
 ####Windows
