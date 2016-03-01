@@ -1,13 +1,15 @@
 #!/usr/bin/python
 from pubsub import pub
 import json as js
-from application_only_auth import Client
+from publishers.TwitterClient import Client
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 import sys
 import os
 import datetime
 import glob
+
+
 
 
 API_KEY, API_SECRET = ('5jquzflYqTUNMNqmpdxPUr4Si', 'RE3tNfpjyhNB5IJatzLiDnoonEw7i2OgWz0o5kSCbS2egllDBv')
@@ -26,6 +28,9 @@ class StandardMessage():
 		self.followers = "null"
 		self.following = "null"
 		
+	def get_dict(self):
+		return self.__dict__
+	
 	def get_message(self):
 		return js.dumps(self.__dict__, sort_keys=True, indent=4, separators=(',', ':'))
 	def get_comment(self):
@@ -35,8 +40,7 @@ class StandardMessage():
 class Main_Gui:
 	def __init__(self):
 		app	= QtGui.QApplication(sys.argv)
-		tabs = QtGui.QTabWidget()
-		tabs.setWindowTitle("fsc")
+		tabs = fscWindow()
 		tab	= QtGui.QWidget()
 		sub = TwitterSubscriber('standard', 'Trump', tab)
 		pub = TwitterPublisher('standard', 'Trump')
@@ -78,44 +82,97 @@ class TwitterPublisher:
 		i = self.client.rate_limit_status()['resources']['search']
 		return i
 	
-	#This should be placed in the Parent class should be passed a message a string and the publisher object
 	def run(self):
 		msg = self.get_data(100)
 		pub.sendMessage(self.search_term, arg1=msg)
-
-class mainTab(QtGui.QWidget):
-	
-	def __init__(self):
-		super.__init__()
+		
 		
 		
 class fscWindow(QtGui.QTabWidget):
 	
 	def __init__(self):
 		super.__init__()
-		self.setWindowTitle('Fscrape')
+		self.setWindowTitle('FSC')
+		self.createMainTab()
 	
 	def add_tab(self, tab, tab_name):
 		self.addTab(tab, tab_name)
+		
+	def create_main_tab(self):
+		layout = QtGui.QVBoxLayout()
+		search_box = 
+		
 	
 
 class tabDropDown(QtGui.QWidget):
-	def __init__(self, publishers, subscribers):
-		super.__init__()
+	def __init__(self):
+		super().__init__()
+		#add box for this hbox
+		self.publisher_menu = QtGui.QComboBox(self)
+		self.subscriber_menu = QtGui.QComboBox(self)
+		self.layout = QHBoxLayout(self)
+		self.setLayout(self.layout)
+		self.imports = []
+		#self.publisher_menu.activated[str].connect(self.run_publisher)
+		#self.subscriber_menu.activated[str].connect(self.run_subscriber)
+		#impliment the publisher calls here?
+		
+	def populate_menus(self):
+		if(os.path.isdir('publishers') and os.path.isdir('subscribers')):
+			pubs = glob.glob('publishers/*Publisher.py')
+			self.add_items_to_menu(pubs, self.publisher_menu)
+			
+			subs = glob.glob('subscribers/*Subscriber.py')
+			self.add_items_to_menu(subs, self.subscriber_menu)
+			
+			self.layout.addWidget(self.publisher_menu)
+			self.layout.addWidget(self.subscriber_menu)
+		else:
+			print("No directory Publishers or no directory Subscriber.")
+	
+	def add_items_to_menu(self, items, menu):
+		for x in range(0, len(items)):
+			b = items[x].split('\\')[1].split('.')[0]
+			self.imports.append([items[x].split('\\')[0],b])
+			menu.addItem(b)
+			
+	def run_publisher(self):
+		return True
 		#add code to create drop down showing all publishers and subscribers that can be used.
 
 class fscEntry(QtGui.QWidget):
 	def __init__(self, data_object):
 		super.__init__()
-		self.layout = QHBoxLayout()
+		self.layout = QtGui.QHBoxLayout()
+		self.data_layout = QtGui.QHBoxLayout()
 		self.data = data_object
+		self.input_box = QTextEdit()
+		self.data_layout.addWidget(self.input_box)
+		self.output_box = QtGui.QWidget()
+		self.output_layout = QtGui.QVBoxLayout(self.output_box)
+		self.populate_output()
+		self.output_box.setLayout(self.output_layout)
+		self.data_layout.addWidget(self.output_box)
+		
+	
+	def populate_output(self):
+		dict_ = json.loads(self.data)
+		for key in dict_.keys():
+			entry = QtGui.QWidget(self.output_box)
+			entry_layout = QtGui.QHBoxLayout(entry)
+			entry_layout.addWidget(QtGui.QLabel(self.output_box).setText)
+			temp = QtGui.QTextEdit(self.output_box).setLineWrapMode(QtGui.QTextEdit.NoWrap)
+			temp.setReadOnly(True)
+			temp.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
+			entry_layout.addWidget(temp.insertHtml(dict_[key]))
+			output_layout.addWidget(entry)
 
 class fscTab(QtGui.QWidget):
 	def __init__(self, search_term, message_type, layout=None):
 		super.__init__()
 		if(not layout):
-			self.primary_layout =  QVBoxLayout()
-			self.primary_layout.addWidget()
+			self.primary_layout =  QtGui.QVBoxLayout(self)
+			self.primary_layout.addWidget(tabDropDown())
 			
 	
 	
@@ -136,31 +193,32 @@ class TwitterSubscriber:
 		self.text_input_areas = []
 		self.current_data = []
 		self.raw_data= []
+		self.parent_window = window
 		if(self.parent_window):
 			self.window = QtGui.QWidget(self.parent_window)
 			self.scroll = QtGui.QScrollArea(self.parent_window)
-			self.tab_layout = QtGui.QVBoxLayout()
+			self.tab_layout = QtGui.QGridLayout()
 
 		pub.subscribe(self.listener, self.topic_name)
 	
 	def update_frame(self):
 		
 		if(self.window):
-			update_file()
+			self.update_file(self.file_name, self.current_data)
 			self.tab_layout.setSpacing(3)
 			self.window.setLayout(self.tab_layout)
 			self.scroll.setWidget(self.window)
 			self.scroll.setWidgetResizable(True)
 			layout = QtGui.QVBoxLayout(self.parent_window)
 			layout.addWidget(self.scroll)
-			for row in range(len(data)):
+			for row in range(len(self.current_data)):
 				input_box = QtGui.QTextEdit()
 				input_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
 				
 				output_box = QtGui.QTextEdit(self.window)
-				output_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
+				output_box.setLineWrapMode(QtGui.QTextEdit.NoWrap)
 				output_box.setReadOnly(True)
-				output_box.insertPlainText(str(data[row]))
+				output_box.insertHtml(str(self.current_data[row]))
 				
 				self.text_input_areas.append(output_box)
 				
@@ -168,7 +226,7 @@ class TwitterSubscriber:
 				self.tab_layout.addWidget(output_box,row,0)
 
 
-	def get_data_from_UI(self)
+	def get_data_from_UI(self):
 		output_areas = []
 		for box in self.text_input_areas:
 			output_areas.append(box.toPlainText())
@@ -192,8 +250,8 @@ class TwitterSubscriber:
 			msg_file.append(msg.__dict__)
 		return msg_file
 
-	def update_file(self, file, msg_array=self.raw_data):
-		if(not msg_array === self.raw_data):	
+	def update_file(self, file, msg_array):
+		if(not msg_array == self.raw_data):	
 			msg_array = create_output(msg_array)
 		with open('data/'+file, 'w', encoding='utf-8') as f:
 			js.dump(msg_array, f)
@@ -204,9 +262,11 @@ class TwitterSubscriber:
 	def listener(self, arg1):
 		self.twitter_call_limit.append(arg1[0])
 		arg1 = arg1[1:]
+		for x in range(len(arg1)):
+			arg1[x] = arg1[x].get_dict()
 		self.raw_data += arg1
 		self.current_data += arg1
-		self.update_file(self.raw_file_name)
+		self.update_file(self.raw_file_name, self.raw_data)
 		self.update_frame()
 
 
@@ -215,7 +275,7 @@ class TwitterSubscriber:
 app	= QtGui.QApplication(sys.argv)
 
 tabs	= QtGui.QTabWidget()
-
+app.setActiveWindow(tabs)
 tabs.setWindowTitle("fsc")
 
 tab	= QtGui.QWidget(tabs)
