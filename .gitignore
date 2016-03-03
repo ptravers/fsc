@@ -7,3 +7,4 @@ fscrape/subscribers/__pycache__/__init__.cpython-34.pyc
 fscrape/messages/__pycache__/StandardMessage.cpython-34.pyc
 *.pyc
 *.json
+fscrape/fun.py

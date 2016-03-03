@@ -37,7 +37,7 @@ class TwitterPublisher:
 		return i
 	
 	#This should be placed in the Parent class should be passed a message a string and the publisher object
-	def run(self):
+	def publish(self):
 		msg = self.get_data(10)
 		pub.sendMessage(self.search_term, arg1=msg)
 

@@ -2,12 +2,29 @@
 from pubsub import pub
 import json as js
 from publishers.TwitterClient import Client
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from PyQt4 import QtGui, QtCore
 import sys
 import os
 import datetime
 import glob
+import re
+regex = re.compile(r'(?!__)([A-Za-z])*(?!__)')
+
+def import_all(import_files):
+	check = import_files[len(import_files)-1]
+	for x in range(len(import_files)-1):
+		module = import_files[x].split('.')[0]
+		if(check == 0):
+			__import__('publishers.'+module)
+		elif(check == 1):
+			__import__('subscribers.'+module)
+		else:
+			__import__('messages.'+module)
+
+import_all(list(filter(regex.match, os.listdir('publishers')))+[0])
+import_all(list(filter(regex.match, os.listdir('subscribers')))+[1])
+import_all(list(filter(regex.match, os.listdir('messages')))+[2])
+
 
 
 
@@ -30,20 +47,12 @@ class StandardMessage():
 		
 	def get_dict(self):
 		return self.__dict__
-	
+
 	def get_message(self):
 		return js.dumps(self.__dict__, sort_keys=True, indent=4, separators=(',', ':'))
+
 	def get_comment(self):
 		return self.comment
-
-		
-class Main_Gui:
-	def __init__(self):
-		app	= QtGui.QApplication(sys.argv)
-		tabs = fscWindow()
-		tab	= QtGui.QWidget()
-		sub = TwitterSubscriber('standard', 'Trump', tab)
-		pub = TwitterPublisher('standard', 'Trump')
 
 
 class TwitterPublisher:
@@ -93,16 +102,12 @@ class fscWindow(QtGui.QTabWidget):
 	def __init__(self):
 		super.__init__()
 		self.setWindowTitle('FSC')
-		self.createMainTab()
+		self.create_main_tab()
 	
 		
 	def create_main_tab(self):
-		layout = QtGui.QVBoxLayout()
-		search_box = QWidget(self)
-		search_box_layout = QHBoxLayout(search_box)
-		text_entry = QLineEdit(search_box)
+		fscTab(self)
 		
-		search_box_layout.addWidget(text_entry)
 		
 	
 
@@ -114,10 +119,7 @@ class tabDropDown(QtGui.QWidget):
 		self.subscriber_menu = QtGui.QComboBox(self)
 		self.layout = QHBoxLayout(self)
 		self.setLayout(self.layout)
-		self.imports = []
-		#self.publisher_menu.activated[str].connect(self.run_publisher)
-		#self.subscriber_menu.activated[str].connect(self.run_subscriber)
-		#impliment the publisher calls here?
+		self.populate_menus()
 		
 	def populate_menus(self):
 		if(os.path.isdir('publishers') and os.path.isdir('subscribers')):
@@ -138,9 +140,6 @@ class tabDropDown(QtGui.QWidget):
 			self.imports.append([items[x].split('\\')[0],b])
 			menu.addItem(b)
 			
-	def run_publisher(self):
-		return True
-		#add code to create drop down showing all publishers and subscribers that can be used.
 
 class fscEntry(QtGui.QWidget):
 	def __init__(self, data_object):
@@ -162,7 +161,7 @@ class fscEntry(QtGui.QWidget):
 		for key in dict_.keys():
 			entry = QtGui.QWidget(self.output_box)
 			entry_layout = QtGui.QHBoxLayout(entry)
-			entry_layout.addWidget(QtGui.QLabel(self.output_box).setText)
+			entry_layout.addWidget(QtGui.QLabel(self.output_box).setText(key))
 			temp = QtGui.QTextEdit(self.output_box).setLineWrapMode(QtGui.QTextEdit.NoWrap)
 			temp.setReadOnly(True)
 			temp.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
@@ -170,17 +169,102 @@ class fscEntry(QtGui.QWidget):
 			output_layout.addWidget(entry)
 
 class fscTab(QtGui.QWidget):
-	def __init__(self, search_term, message_type, layout=None):
+	def __init__(self, window, search_term=None, message_type=None, sub_choices=[], pub_choices=[]):
 		super.__init__()
-		if(not layout):
-			self.primary_layout =  QtGui.QVBoxLayout(self)
-			self.primary_layout.addWidget(tabDropDown())
+		
+		self.parent_window = window
+		
+		self.main_tab_layout = QtGui.QHBoxLayout()
+		
+		self.create_new = QtGui.QWidget(self)
+		self.create_new_layout =  QtGui.QVBoxLayout()
+		self.create_new_layout.addWidget(tabDropDown())
+		
+		
+		self.selected_options = QtGui.QWidget(self.create_new)
+		self.selected_options_layout = QtGui.QHBoxLayout()
+		
+		self.publisher_choices_UI = QtGui.QWidget(self.selected_options)
+		self.publisher_choices_UI_layout = QtGui.QVBoxLayout()
+		self.publisher_choices_UI.setLayout(self.publisher_choices_UI_layout)
+		self.selected_options_layout.addWidget(self.publisher_choices_UI)
+		
+		
+		self.subscriber_choices_UI = QtGui.QWidget(self.selected_options)
+		self.subscriber_choices_UI_layout = QtGui.QVBoxLayout()
+		self.subscriber_choices_UI.setLayout(self.subscriber_choices_UI_layout)
+		self.selected_options_layout.addWidget(self.subscriber_choices_UI)
+		
+		self.subscriber_choices = sub_choices
+		self.publisher_choices = pub_choices
+		
+		self.selected_options_layout.addWidget(self.subscriber_choices_UI)
+		self.selected_options_layout.addWidget(self.publisher_choices_UI)
+		
+		drop_down.publisher_menu.activated[str].connect(self.run_publisher)
+		drop_down.subscriber_menu.activated[str].connect(self.run_subscriber)
+		
+		if(search_term == None):
+			self.text_entry = QtGui.QLineEdit(self.create_new)
+			self.create_new_layout.addWidget(text_entry)
+			self.create_button = QtGui.QPushButton("Create", self.create_new)
+			self.create_button.connect(self.create_and_refresh)
+		
+		self.search_term = search_term
+		self.message_type = message_type
+		self.layout = layout
+		
+		
+	def run_publisher(self):
+		self.publisher_choices.append(text)
+		temp = QtGui.QLabel()
+		temp.setText(text)
+		subs.publisher_choices_UI_layout.addWidget(temp)
+		self.create_new_publisher(text)
+	
+	def run_subscriber(self):
+		self.subscriber_choices.append(text)
+		temp = QtGui.QLabel()
+		temp.setText(text)
+		self.subscriber_choices_UI_layout.addWidget(temp)
+		self.create_new_subscriber(text)
+			
+	def create_new_publisher(self, text):
+		if(not((self.search_term == None) or (self.message_type == None))):
+			pub = getattr(publishers, text)
+			pub = getattr(pub, text)
+			pub(self.message_type, self.search_term)
+			
+	def create_new_subscriber(self, text):
+		if(not((self.search_term == None) or (self.message_type == None))):
+			sub = getattr(subscribers, text)
+			sub = getattr(sub, text)
+			new_tab = fscTab(self.primary_window, self.search_term, self.message_type, self.subscriber_choices,self.publisher_choices)
+			self.parent_window.addTab(new_tab, search_term+" "+text)
+			sub(self.message_type, self.search_term, new_tab)
+			
+	
+	def create_and_refresh(self):
+		self.search_term = self.text_entry.toPlainText() #test that this returns None
+		self.message_type = 'standard'
+		if(((self.search_term is not None) or (self.search_term is not '')) and (self.message_type is not None))
+			for a in reversed(range(self.publisher_choices_UI_layout.count())):
+				w = self.publisher_choices_UI_layout.takeAt(a)
+				if w is not None:
+					w = w.widget()
+					w.deleteLater()
+			for pub in self.publisher_choices:
+				self.create_new_publisher(pub)
+			for sub in self.subscriber_choices:
+				self.create_new_subscriber(sub)
 			
 	
 	
 def main():
 	fscraper = QApplication(sys.argv)
+	
 	primary_window = fscWindow()
+	fscraper.setActiveWindow(primary_window)
 	primary_window.show()
 	primary_window.raise_()
 	fscraper.exec_()
