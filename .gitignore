@@ -8,3 +8,6 @@ fscrape/messages/__pycache__/StandardMessage.cpython-34.pyc
 *.pyc
 *.json
 fscrape/fun.py
+*.txt
+dist/fscrape-0.0.1-py3.4.egg
+fscrape.egg-info/PKG-INFO

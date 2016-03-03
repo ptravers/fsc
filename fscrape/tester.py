@@ -103,6 +103,7 @@ class fscWindow(QtGui.QTabWidget):
 		super.__init__()
 		self.setWindowTitle('FSC')
 		self.create_main_tab()
+		self.show()
 	
 		
 	def create_main_tab(self):
