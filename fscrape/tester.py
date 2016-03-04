@@ -1,6 +1,9 @@
 #!/usr/bin/python
 from pubsub import pub
 import json as js
+import publishers
+import subscribers
+import messages
 from publishers.TwitterClient import Client
 from PyQt4 import QtGui, QtCore
 import sys
@@ -14,7 +17,9 @@ def import_all(import_files):
 	check = import_files[len(import_files)-1]
 	for x in range(len(import_files)-1):
 		module = import_files[x].split('.')[0]
+		print(module)
 		if(check == 0):
+			print(module)
 			__import__('publishers.'+module)
 		elif(check == 1):
 			__import__('subscribers.'+module)
@@ -26,6 +31,7 @@ import_all(list(filter(regex.match, os.listdir('subscribers')))+[1])
 import_all(list(filter(regex.match, os.listdir('messages')))+[2])
 
 
+print(getattr(publishers.TwitterPublisher, 'TwitterPublisher'))
 
 
 
@@ -53,57 +59,24 @@ class StandardMessage():
 
 	def get_comment(self):
 		return self.comment
-
-
-class TwitterPublisher:
-	def __init__(self, message, term):
-		self.client = Client(API_KEY, API_SECRET)
-		self.message_type = message
-		self.search_term = term
-
-		self.search_link_base = 'https://api.twitter.com/1.1/search/tweets.json?q='
-		self.link_base = 'https://twitter.com/'
-		self.run()
-	
-	#Get rate limit when the rate limit is less than the count given the system
-	#must request rate_limit. Then enter waiting state
-	
-	def get_data(self, count):
-		search_link = self.search_link_base + self.search_term + "&count=" + str(count)
-		output = self.client.request(search_link)
-		msg_array = []
-		msg_array.append(self.get_rate())
-		for x in range(len(output.get('statuses'))):
-			msg = StandardMessage()
-			msg.mentions = output.get('statuses')[x]['entities']['user_mentions']
-			msg.id = output.get('statuses')[0]['id_str']
-			msg.shares = str(output.get('statuses')[x]['retweet_count'])
-			msg.likes = str(output.get('statuses')[x]['favorite_count'])
-			msg.hashtags = output.get('statuses')[x]['entities']['hashtags']
-			msg.url = self.link_base + output.get('statuses')[x]['user']['screen_name'] + '/status/' + msg.id
-			msg.comment = str(output.get('statuses')[x]['text'])
-			output.get('statuses')[x]['text']
-			msg.shared = str(output.get('statuses')[x]['retweeted'])
-			msg_array.append(msg)
-		return msg_array
-	
-	def get_rate(self):
-		i = self.client.rate_limit_status()['resources']['search']
-		return i
-	
-	def run(self):
-		msg = self.get_data(100)
-		pub.sendMessage(self.search_term, arg1=msg)
-		
 		
 		
 class fscWindow(QtGui.QTabWidget):
 	
-	def __init__(self):
-		super.__init__()
+	def __init__(self, parent):
+		super().__init__()
+		parent.setActiveWindow(self)
+		
+		print(getattr(publishers, 'TwitterPublisher'))
+
+
 		self.setWindowTitle('FSC')
+		self.resize(600, 600)
+		self.move(300, 300)
 		self.create_main_tab()
 		self.show()
+		
+		sys.exit(app.exec_())
 	
 		
 	def create_main_tab(self):
@@ -118,7 +91,7 @@ class tabDropDown(QtGui.QWidget):
 		#add box for this hbox
 		self.publisher_menu = QtGui.QComboBox(self)
 		self.subscriber_menu = QtGui.QComboBox(self)
-		self.layout = QHBoxLayout(self)
+		self.layout = QtGui.QHBoxLayout(self)
 		self.setLayout(self.layout)
 		self.populate_menus()
 		
@@ -138,13 +111,12 @@ class tabDropDown(QtGui.QWidget):
 	def add_items_to_menu(self, items, menu):
 		for x in range(0, len(items)):
 			b = items[x].split('\\')[1].split('.')[0]
-			self.imports.append([items[x].split('\\')[0],b])
 			menu.addItem(b)
 			
 
 class fscEntry(QtGui.QWidget):
 	def __init__(self, data_object):
-		super.__init__()
+		super().__init__()
 		self.layout = QtGui.QHBoxLayout()
 		self.data_layout = QtGui.QHBoxLayout()
 		self.data = data_object
@@ -168,33 +140,47 @@ class fscEntry(QtGui.QWidget):
 			temp.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
 			entry_layout.addWidget(temp.insertHtml(dict_[key]))
 			output_layout.addWidget(entry)
+			
 
 class fscTab(QtGui.QWidget):
 	def __init__(self, window, search_term=None, message_type=None, sub_choices=[], pub_choices=[]):
-		super.__init__()
+		super().__init__()
 		
 		self.parent_window = window
 		
-		self.main_tab_layout = QtGui.QHBoxLayout()
+		#Will be used when there is the added capacity to open existing files
+		main_tab_layout = QtGui.QVBoxLayout()
+		self.setLayout(main_tab_layout)
+		
+		drop_down = tabDropDown()
+		
+		print(getattr(publishers, 'TwitterPublisher'))
+
 		
 		self.create_new = QtGui.QWidget(self)
+		main_tab_layout.addWidget(self.create_new)
 		self.create_new_layout =  QtGui.QVBoxLayout()
-		self.create_new_layout.addWidget(tabDropDown())
+		self.create_new_layout.addWidget(drop_down)
+		self.create_new.setLayout(self.create_new_layout)
 		
 		
 		self.selected_options = QtGui.QWidget(self.create_new)
+		self.create_new_layout.addWidget(self.selected_options)
 		self.selected_options_layout = QtGui.QHBoxLayout()
+		self.selected_options.setLayout(self.selected_options_layout)
 		
 		self.publisher_choices_UI = QtGui.QWidget(self.selected_options)
 		self.publisher_choices_UI_layout = QtGui.QVBoxLayout()
 		self.publisher_choices_UI.setLayout(self.publisher_choices_UI_layout)
-		self.selected_options_layout.addWidget(self.publisher_choices_UI)
+		
 		
 		
 		self.subscriber_choices_UI = QtGui.QWidget(self.selected_options)
 		self.subscriber_choices_UI_layout = QtGui.QVBoxLayout()
 		self.subscriber_choices_UI.setLayout(self.subscriber_choices_UI_layout)
+		#move the selected options segment to dropdown
 		self.selected_options_layout.addWidget(self.subscriber_choices_UI)
+		self.selected_options_layout.addWidget(self.publisher_choices_UI)
 		
 		self.subscriber_choices = sub_choices
 		self.publisher_choices = pub_choices
@@ -207,23 +193,24 @@ class fscTab(QtGui.QWidget):
 		
 		if(search_term == None):
 			self.text_entry = QtGui.QLineEdit(self.create_new)
-			self.create_new_layout.addWidget(text_entry)
+			self.create_new_layout.addWidget(self.text_entry)
 			self.create_button = QtGui.QPushButton("Create", self.create_new)
-			self.create_button.connect(self.create_and_refresh)
+			self.create_button.clicked.connect(self.create_and_refresh)
+			self.create_new_layout.addWidget(self.create_button)
 		
 		self.search_term = search_term
 		self.message_type = message_type
-		self.layout = layout
+		self.parent_window.addTab(self, "Create Tab")
 		
 		
-	def run_publisher(self):
+	def run_publisher(self, text):
 		self.publisher_choices.append(text)
 		temp = QtGui.QLabel()
 		temp.setText(text)
-		subs.publisher_choices_UI_layout.addWidget(temp)
+		self.publisher_choices_UI_layout.addWidget(temp)
 		self.create_new_publisher(text)
 	
-	def run_subscriber(self):
+	def run_subscriber(self, text):
 		self.subscriber_choices.append(text)
 		temp = QtGui.QLabel()
 		temp.setText(text)
@@ -240,15 +227,16 @@ class fscTab(QtGui.QWidget):
 		if(not((self.search_term == None) or (self.message_type == None))):
 			sub = getattr(subscribers, text)
 			sub = getattr(sub, text)
-			new_tab = fscTab(self.primary_window, self.search_term, self.message_type, self.subscriber_choices,self.publisher_choices)
-			self.parent_window.addTab(new_tab, search_term+" "+text)
+			new_tab = fscTab(self.parent_window, self.search_term, self.message_type, self.subscriber_choices,self.publisher_choices)
+			self.parent_window.addTab(new_tab, self.search_term+" "+text)
 			sub(self.message_type, self.search_term, new_tab)
-			
+		
+		
 	
 	def create_and_refresh(self):
-		self.search_term = self.text_entry.toPlainText() #test that this returns None
+		self.search_term = self.text_entry.text() #test that this returns None
 		self.message_type = 'standard'
-		if(((self.search_term is not None) or (self.search_term is not '')) and (self.message_type is not None))
+		if(((self.search_term is not None) or (self.search_term is not '')) and (self.message_type is not None)):
 			for a in reversed(range(self.publisher_choices_UI_layout.count())):
 				w = self.publisher_choices_UI_layout.takeAt(a)
 				if w is not None:
@@ -285,6 +273,7 @@ class TwitterSubscriber:
 			self.window = QtGui.QWidget(self.parent_window)
 			self.scroll = QtGui.QScrollArea(self.parent_window)
 			self.tab_layout = QtGui.QGridLayout()
+			self.parent_window.create_new_layout.addWidget(self.window)
 
 		pub.subscribe(self.listener, self.topic_name)
 	
@@ -294,7 +283,7 @@ class TwitterSubscriber:
 			self.update_file(self.file_name, self.current_data)
 			self.tab_layout.setSpacing(3)
 			self.window.setLayout(self.tab_layout)
-			self.scroll.setWidget(self.window)
+			self.scroll.setWidget(self.parent_window)
 			self.scroll.setWidgetResizable(True)
 			layout = QtGui.QVBoxLayout(self.parent_window)
 			layout.addWidget(self.scroll)
@@ -361,24 +350,5 @@ class TwitterSubscriber:
 
 app	= QtGui.QApplication(sys.argv)
 
-tabs	= QtGui.QTabWidget()
-app.setActiveWindow(tabs)
-tabs.setWindowTitle("fsc")
 
-tab	= QtGui.QWidget(tabs)
-
-sub = TwitterSubscriber('standard', 'Trump', tab)
-pub = TwitterPublisher('standard', 'Trump')
-
-tabs.addTab(sub.parent_window, sub.topic_name)
-
-#Resize width and height
-tabs.resize(600, 600)
-    
-#Move QTabWidget to x:300,y:300
-tabs.move(300, 300)
-  
-tabs.show()
-    
-sys.exit(app.exec_())
-
+fscWindow(app)

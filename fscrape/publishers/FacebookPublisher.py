@@ -5,7 +5,7 @@ from pubsub import pub
 
 class FacebookPublisher():
 
-	def __init__(self):
+	def __init__(self, message_type, search_term):
 		#initliasie the publisher
 		self.name = 'Facebook'
 		
