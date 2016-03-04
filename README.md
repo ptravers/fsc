@@ -17,7 +17,7 @@ The project is licenced under the GPLv3 licence. No support is provided.
 
 Please run the following command in a bash terminal
 ```bash
-sudo apt-get install python3-sip python3-qt4 python3-setuptools python3-pip
+sudo apt-get install python3-sip python3-pyqt4 python3-setuptools python3-pip
 ```
 
 ####Windows
