@@ -352,13 +352,13 @@ class TwitterSubscriber:
 		self.update_frame()
 
 
-# def funfun(arg1):
-	# print('thank fucking god' + arg1)
+def funfun(arg1):
+	print('thank fucking god' + arg1[2].get_message())
 # pub.subscribe(funfun, 'please')
 # pub.sendMessage('please', arg1="findme")
 # while(True):
 	# pub.sendMessage('please', arg1="find me")
 
 app	= QtGui.QApplication(sys.argv)
-
+pub.subscribe(funfun, 'trump')
 fscWindow(app)

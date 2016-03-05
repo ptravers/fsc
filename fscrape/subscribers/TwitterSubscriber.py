@@ -2,7 +2,15 @@
 from pubsub import pub
 import json as js
 from PyQt4 import QtGui,QtCore
+import os
 import datetime
+
+class FOO():
+	def __init_():
+		print("made foo")
+
+	def foo(self, arg1):
+		print('arrived in sub')
 
 class TwitterSubscriber:
 	def __init__(self, msg_type, topic_name, window=None):
@@ -20,10 +28,11 @@ class TwitterSubscriber:
 			self.scroll = QtGui.QScrollArea(self.parent_window)
 			self.tab_layout = QtGui.QGridLayout()
 			#self.parent_window.create_new_layout.addWidget(self.window)
-
-		pub.subscribe(self.listener, self.topic_name)
+		#binds the subscriber so that it doesn't get garbage collected before data is retrieved
+		hard_bind = pub.subscribe(self.listener, self.topic_name)
+		print("listener " + self.listener.__name__ + " topic: " + self.topic_name)
 		print("subscriber created")
-	
+
 	def update_frame(self):
 		print(self.current_data)
 		if(self.window):
@@ -38,14 +47,14 @@ class TwitterSubscriber:
 			for row in range(len(self.current_data)):
 				input_box = QtGui.QTextEdit()
 				input_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
-				
+
 				output_box = QtGui.QTextEdit(self.window)
 				output_box.setLineWrapMode(QtGui.QTextEdit.NoWrap)
 				output_box.setReadOnly(True)
 				output_box.insertHtml(str(self.current_data[row]))
-				
+
 				self.text_input_areas.append(output_box)
-				
+
 				self.tab_layout.addWidget(input_box,row,1)
 				self.tab_layout.addWidget(output_box,row,0)
 
@@ -76,14 +85,14 @@ class TwitterSubscriber:
 
 	def update_file(self, file, msg_array):
 		print(msg_array)
-		if(not msg_array == self.raw_data):	
-			msg_array = create_output(msg_array)
+		if(not msg_array == self.raw_data):
+			msg_array = self.create_output(msg_array)
 		with open('data/'+file, 'w', encoding='utf-8') as f:
 			js.dump(msg_array, f)
-	
+
 	def name_file(self, primary_name):
 		return str(primary_name) + "_" + str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":","_").split(".")[0] + ".json"
-	
+
 	def listener(self, arg1):
 		print('arrived')
 		self.twitter_call_limit.append(arg1[0])
