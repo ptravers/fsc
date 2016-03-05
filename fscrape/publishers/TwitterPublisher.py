@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import json as js
+from pubsub import pub
 from publishers.TwitterClient import Client
 from messages.StandardMessage import StandardMessage
 
@@ -11,35 +12,42 @@ class TwitterPublisher:
 		self.client = Client(API_KEY, API_SECRET)
 		self.message_type = message
 		self.search_term = term
+
 		self.search_link_base = 'https://api.twitter.com/1.1/search/tweets.json?q='
 		self.link_base = 'https://twitter.com/'
-		self.run()
-		
+		print("publisher created")
+		self.puiblish()
+	
+	#Get rate limit when the rate limit is less than the count given the system
+	#must request rate_limit. Then enter waiting state
+	
 	def get_data(self, count):
 		search_link = self.search_link_base + self.search_term + "&count=" + str(count)
 		output = self.client.request(search_link)
 		msg_array = []
-		msg_array.append(get_rate(self))
+		msg_array.append(self.get_rate())
 		for x in range(len(output.get('statuses'))):
 			msg = StandardMessage()
 			msg.mentions = output.get('statuses')[x]['entities']['user_mentions']
+			msg.id = output.get('statuses')[0]['id_str']
 			msg.shares = str(output.get('statuses')[x]['retweet_count'])
 			msg.likes = str(output.get('statuses')[x]['favorite_count'])
 			msg.hashtags = output.get('statuses')[x]['entities']['hashtags']
-			msg.url = self.link_base + output.get('statuses')[x]['user']['screen_name'] + '/' + output.get('statuses')[0]['id_str']
+			msg.url = self.link_base + output.get('statuses')[x]['user']['screen_name'] + '/status/' + msg.id
 			msg.comment = str(output.get('statuses')[x]['text'])
+			output.get('statuses')[x]['text']
 			msg.shared = str(output.get('statuses')[x]['retweeted'])
 			msg_array.append(msg)
 		return msg_array
 	
 	def get_rate(self):
-		i = self.client.rate_limit_status()
+		i = self.client.rate_limit_status()['resources']['search']
 		return i
 	
-	#This should be placed in the Parent class should be passed a message a string and the publisher object
-	def run(self):
-		msg = self.get_data(10)
-		pub.sendMessage(self.search_term, arg1=msg)
-
-
+	def puiblish(self):
+		msg = self.get_data(100)
+		
+		while(True):
+			print('publish run: ' + str(len(msg)) + ' topic = ' + self.search_term)
+			pub.sendMessage(self.search_term, arg1=msg)
 
