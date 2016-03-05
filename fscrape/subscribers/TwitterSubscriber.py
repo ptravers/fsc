@@ -22,6 +22,7 @@ class TwitterSubscriber:
 			#self.parent_window.create_new_layout.addWidget(self.window)
 
 		pub.subscribe(self.listener, self.topic_name)
+		print("subscriber created")
 	
 	def update_frame(self):
 		print(self.current_data)

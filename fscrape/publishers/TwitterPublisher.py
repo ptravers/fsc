@@ -15,6 +15,7 @@ class TwitterPublisher:
 
 		self.search_link_base = 'https://api.twitter.com/1.1/search/tweets.json?q='
 		self.link_base = 'https://twitter.com/'
+		print("publisher created")
 		self.puiblish()
 	
 	#Get rate limit when the rate limit is less than the count given the system
@@ -46,6 +47,7 @@ class TwitterPublisher:
 	def puiblish(self):
 		msg = self.get_data(100)
 		
-		print('publish run: ' + str(len(msg)) + ' topic = ' + self.search_term)
-		pub.sendMessage(self.search_term, arg1=msg)
+		while(True):
+			print('publish run: ' + str(len(msg)) + ' topic = ' + self.search_term)
+			pub.sendMessage(self.search_term, arg1=msg)
 

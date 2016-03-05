@@ -17,9 +17,7 @@ def import_all(import_files):
 	check = import_files[len(import_files)-1]
 	for x in range(len(import_files)-1):
 		module = import_files[x].split('.')[0]
-		print(module)
 		if(check == 0):
-			print(module)
 			__import__('publishers.'+module)
 		elif(check == 1):
 			__import__('subscribers.'+module)
@@ -31,7 +29,7 @@ import_all(list(filter(regex.match, os.listdir('subscribers')))+[1])
 import_all(list(filter(regex.match, os.listdir('messages')))+[2])
 
 
-print(getattr(publishers.TwitterPublisher, 'TwitterPublisher'))
+print(getattr(subscribers.TwitterSubscriber, 'TwitterSubscriber'))
 
 
 
@@ -67,7 +65,7 @@ class fscWindow(QtGui.QTabWidget):
 		super().__init__()
 		parent.setActiveWindow(self)
 		
-		print(getattr(publishers, 'TwitterPublisher'))
+		print('creating window')
 
 
 		self.setWindowTitle('FSC')
@@ -154,7 +152,7 @@ class fscTab(QtGui.QWidget):
 		
 		drop_down = tabDropDown()
 		
-		print(getattr(publishers, 'TwitterPublisher'))
+		print('creating tab')
 
 		
 		self.create_new = QtGui.QWidget(self)
@@ -242,10 +240,10 @@ class fscTab(QtGui.QWidget):
 				if w is not None:
 					w = w.widget()
 					w.deleteLater()
-			for pub in self.publisher_choices:
-				self.create_new_publisher(pub)
 			for sub in self.subscriber_choices:
 				self.create_new_subscriber(sub)
+			for pub in self.publisher_choices:
+				self.create_new_publisher(pub)
 			
 	
 	
@@ -275,7 +273,9 @@ class TwitterSubscriber:
 			self.tab_layout = QtGui.QGridLayout()
 			self.parent_window.create_new_layout.addWidget(self.window)
 
+		
 		pub.subscribe(self.listener, self.topic_name)
+		print("passed subscriber initialisation")
 	
 	def update_frame(self):
 		
@@ -336,6 +336,7 @@ class TwitterSubscriber:
 		return str(primary_name) + "_" + str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":","_").split(".")[0] + ".json"
 	
 	def listener(self, arg1):
+		print("I've been run")
 		self.twitter_call_limit.append(arg1[0])
 		arg1 = arg1[1:]
 		for x in range(len(arg1)):
@@ -346,7 +347,12 @@ class TwitterSubscriber:
 		self.update_frame()
 
 
-
+# def funfun(arg1):
+	# print('thank fucking god' + arg1)
+# pub.subscribe(funfun, 'please')
+# pub.sendMessage('please', arg1="findme")
+# while(True):
+	# pub.sendMessage('please', arg1="find me")
 
 app	= QtGui.QApplication(sys.argv)
 
