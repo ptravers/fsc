@@ -17,10 +17,10 @@ class TwitterPublisher:
 		self.link_base = 'https://twitter.com/'
 		print("publisher created")
 		self.puiblish()
-	
+
 	#Get rate limit when the rate limit is less than the count given the system
 	#must request rate_limit. Then enter waiting state
-	
+
 	def get_data(self, count):
 		search_link = self.search_link_base + self.search_term + "&count=" + str(count)
 		output = self.client.request(search_link)
@@ -39,15 +39,14 @@ class TwitterPublisher:
 			msg.shared = str(output.get('statuses')[x]['retweeted'])
 			msg_array.append(msg)
 		return msg_array
-	
+
 	def get_rate(self):
 		i = self.client.rate_limit_status()['resources']['search']
 		return i
-	
+
 	def puiblish(self):
 		msg = self.get_data(100)
-		
-		while(True):
+		for i in range(10):
 			print('publish run: ' + str(len(msg)) + ' topic = ' + self.search_term)
 			pub.sendMessage(self.search_term, arg1=msg)
 

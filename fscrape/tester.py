@@ -4,7 +4,6 @@ import json as js
 import publishers
 import subscribers
 import messages
-from publishers.TwitterClient import Client
 from PyQt4 import QtGui, QtCore
 import sys
 import os
@@ -108,27 +107,31 @@ class tabDropDown(QtGui.QWidget):
 
 	def add_items_to_menu(self, items, menu):
 		for x in range(0, len(items)):
-			b = items[x].split('\\')[1].split('.')[0]
+			print(items[x])
+			if os.name == 'nt':
+				b = items[x].split('\\')[1].split('.')[0]
+			else:
+				b = items[x].split('/')[1].split('.')[0]
 			menu.addItem(b)
 
 
 class fscEntry(QtGui.QWidget):
 	def __init__(self, data_object):
 		super().__init__()
-		self.layout = QtGui.QHBoxLayout()
 		self.data_layout = QtGui.QHBoxLayout()
 		self.data = data_object
-		self.input_box = QTextEdit()
+		self.input_box = QtGui.QTextEdit()
 		self.data_layout.addWidget(self.input_box)
 		self.output_box = QtGui.QWidget()
 		self.output_layout = QtGui.QVBoxLayout(self.output_box)
 		self.populate_output()
 		self.output_box.setLayout(self.output_layout)
 		self.data_layout.addWidget(self.output_box)
+		self.setLayout(self.data_layout)
 
 
 	def populate_output(self):
-		dict_ = json.loads(self.data)
+		dict_ = js.loads(self.data)
 		for key in dict_.keys():
 			entry = QtGui.QWidget(self.output_box)
 			entry_layout = QtGui.QHBoxLayout(entry)
@@ -137,7 +140,7 @@ class fscEntry(QtGui.QWidget):
 			temp.setReadOnly(True)
 			temp.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
 			entry_layout.addWidget(temp.insertHtml(dict_[key]))
-			output_layout.addWidget(entry)
+			self.output_layout.addWidget(entry)
 
 
 class fscTab(QtGui.QWidget):
@@ -243,13 +246,13 @@ class fscTab(QtGui.QWidget):
 					w.deleteLater()
 			for sub in self.subscriber_choices:
 				self.create_new_subscriber(sub)
-			for pub in self.publisher_choices:
-				self.create_new_publisher(pub)
+			for pubs in self.publisher_choices:
+				self.create_new_publisher(pubs)
 
 
 
 def main():
-	fscraper = QApplication(sys.argv)
+	fscraper = QtGui.QApplication(sys.argv)
 
 	primary_window = fscWindow()
 	fscraper.setActiveWindow(primary_window)
@@ -330,7 +333,7 @@ class TwitterSubscriber:
 
 	def update_file(self, file, msg_array):
 		if(not msg_array == self.raw_data):
-			msg_array = create_output(msg_array)
+			msg_array = self.create_output(msg_array)
 		with open('data/'+file, 'w', encoding='utf-8') as f:
 			js.dump(msg_array, f)
 
