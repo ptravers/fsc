@@ -8,6 +8,7 @@ import datetime
 class FOO():
 	def __init_():
 		print("made foo")
+		b = pub.subscribe(self.foo, 'trump')
 
 	def foo(self, arg1):
 		print('arrived in sub')
@@ -29,14 +30,13 @@ class TwitterSubscriber:
 			self.tab_layout = QtGui.QGridLayout()
 			#self.parent_window.create_new_layout.addWidget(self.window)
 		#binds the subscriber so that it doesn't get garbage collected before data is retrieved
-		hard_bind = pub.subscribe(self.listener, self.topic_name)
+		hard_bind = pub.subscribe(self.listener, 'trump')
+		a = FOO()
 		print("listener " + self.listener.__name__ + " topic: " + self.topic_name)
 		print("subscriber created")
 
 	def update_frame(self):
-		print(self.current_data)
 		if(self.window):
-			print(self.current_data)
 			self.update_file(self.file_name, self.current_data)
 			self.tab_layout.setSpacing(3)
 			self.window.setLayout(self.tab_layout)
@@ -84,7 +84,6 @@ class TwitterSubscriber:
 		return msg_file
 
 	def update_file(self, file, msg_array):
-		print(msg_array)
 		if(not msg_array == self.raw_data):
 			msg_array = self.create_output(msg_array)
 		with open('data/'+file, 'w', encoding='utf-8') as f:
