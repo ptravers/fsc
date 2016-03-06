@@ -46,8 +46,5 @@ class TwitterPublisher:
 
 	def puiblish(self):
 		msg = self.get_data(100)
-		for i in range(10):
-			print('publish run: ' + str(len(msg)) + ' topic = ' + self.search_term)
-			print(msg[1])
-			pub.sendMessage(self.search_term, arg1=msg)
+		pub.sendMessage(self.search_term, arg1=msg)
 

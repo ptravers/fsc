@@ -4,14 +4,7 @@ import json as js
 from PyQt4 import QtGui,QtCore
 import os
 import datetime
-
-class FOO():
-	def __init_():
-		print("made foo")
-		b = pub.subscribe(self.foo, 'trump')
-
-	def foo(self, arg1):
-		print('arrived in sub')
+from fscUI.fscEntry import fscEntry
 
 class TwitterSubscriber:
 	def __init__(self, msg_type, topic_name, window=None):
@@ -26,37 +19,18 @@ class TwitterSubscriber:
 		self.parent_window = window
 		if(self.parent_window):
 			self.window = QtGui.QWidget(self.parent_window)
+			self.window_layout = QVBoxLayout(self.window)
+			self.window.setLayout(self.window_layout)
 			self.scroll = QtGui.QScrollArea(self.parent_window)
-			self.tab_layout = QtGui.QGridLayout()
-			#self.parent_window.create_new_layout.addWidget(self.window)
+			self.scroll.setWidget(self.window)
+			self.scroll.setWidgetResizable(True)
+			self.parent_window.create_new_layout.addWidget(self.window)
 		#binds the subscriber so that it doesn't get garbage collected before data is retrieved
 		hard_bind = pub.subscribe(self.listener, 'trump')
-		a = FOO()
-		print("listener " + self.listener.__name__ + " topic: " + self.topic_name)
-		print("subscriber created")
 
 	def update_frame(self):
 		if(self.window):
-			self.update_file(self.file_name, self.current_data)
-			self.tab_layout.setSpacing(3)
-			self.window.setLayout(self.tab_layout)
-			self.scroll.setWidget(self.parent_window)
-			self.scroll.setWidgetResizable(True)
-			layout = QtGui.QVBoxLayout(self.parent_window)
-			layout.addWidget(self.scroll)
-			for row in range(len(self.current_data)):
-				input_box = QtGui.QTextEdit()
-				input_box.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
-
-				output_box = QtGui.QTextEdit(self.window)
-				output_box.setLineWrapMode(QtGui.QTextEdit.NoWrap)
-				output_box.setReadOnly(True)
-				output_box.insertHtml(str(self.current_data[row]))
-
-				self.text_input_areas.append(output_box)
-
-				self.tab_layout.addWidget(input_box,row,1)
-				self.tab_layout.addWidget(output_box,row,0)
+			
 
 
 	def get_data_from_UI(self):
