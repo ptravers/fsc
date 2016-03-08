@@ -11,54 +11,78 @@ class TwitterSubscriber:
 		self.topic_name = str(topic_name)
 		self.msg_type = msg_type
 		self.twitter_call_limit = []
-		self.raw_file_name = "raw_" + self.name_file(topic_name)
 		self.file_name = self.name_file(topic_name)
-		self.text_input_areas = []
-		self.current_data = []
-		self.raw_data= []
+		self.current_msgs = []
+		self.UI_msgs = []
 		self.parent_window = window
+		try:
+			f = open('data/'+self.file_name, 'x')	
+			f.close()
+		except FileExistsError:
+			pass
 		if(self.parent_window):
-			self.window = QtGui.QWidget(self.parent_window)
-			self.window_layout = QVBoxLayout(self.window)
-			self.window.setLayout(self.window_layout)
-			self.scroll = QtGui.QScrollArea(self.parent_window)
-			self.scroll.setWidget(self.window)
-			self.scroll.setWidgetResizable(True)
-			self.parent_window.create_new_layout.addWidget(self.window)
+			self.data_area = QtGui.QWidget()
+			self.data_area_layout = QtGui.QVBoxLayout()
+			self.data_area.setLayout(self.data_area_layout)
+			self.parent_window.create_new_layout.addWidget(self.data_area)
 		#binds the subscriber so that it doesn't get garbage collected before data is retrieved
-		hard_bind = pub.subscribe(self.listener, 'trump')
+		hard_bind = pub.subscribe(self.listener, topic_name)
 
 	def update_frame(self):
-		if(self.window):
+		if(self.parent_window):
+			self.update_file(self.file_name, self.current_msgs)
+			self.current_msgs = self.read_file(self.file_name)
+			for x in range(len(self.UI_msgs), len(self.current_msgs)):
+				datum = self.current_msgs[x]
+				element = fscEntry(datum)
+				self.UI_msgs.append(element)
+				self.data_area_layout.addWidget(element)
 			
-
-
+				
+				
+				
+	
+	#get_data_from_UI iterates over a list of input QtextEdit widgets
+	#then retrieves whatever is currently written in them
+	
 	def get_data_from_UI(self):
 		output_areas = []
-		for box in self.text_input_areas:
-			output_areas.append(box.toPlainText())
+		for box in self.UI_msgs:
+			output_areas.append(box.get_input_data())
 		return output_areas
 
+	#read_file will load  a file provided it is non empty
+	#when read_file loads a file it converts it in to an array of dicts
+	#Owing to the structure of the file being that of a json array
+	
 	def read_file(self, file):
 		#file = glob.glob(file+'*.json')
 		if(os.path.exists('data/'+file)):
 			with open(os.path.join('data/' , file), encoding='utf-8') as f:
-				return js.load(f)
+				try:
+					return js.load(f)
+				except ValueError:
+					print('ValueError')
 		else :
 			print("There is no /data directory available to fsc in the working directory or the required file has been deleted.")
 
+	#create_output first gets all the data from the UI text areas		
+	#then it adds that data to each corresponding dict
+	
 	def create_output(self, msg_array):
 		ui_data = self.get_data_from_UI()
 		x = 0
 		msg_file = []
 		for msg in msg_array:
-			msg.node = ui_data[x]
+			msg['node'] = ui_data[x]
 			x += 1
-			msg_file.append(msg.__dict__)
+			msg_file.append(msg)
 		return msg_file
-
-	def update_file(self, file, msg_array):
-		if(not msg_array == self.raw_data):
+	
+	#
+	
+	def update_file(self,file, msg_array, raw_type=False):
+		if(not raw_type and len(self.UI_msgs) == len(msg_array)):
 			msg_array = self.create_output(msg_array)
 		with open('data/'+file, 'w', encoding='utf-8') as f:
 			js.dump(msg_array, f)
@@ -67,12 +91,12 @@ class TwitterSubscriber:
 		return str(primary_name) + "_" + str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":","_").split(".")[0] + ".json"
 
 	def listener(self, arg1):
-		print('arrived')
+		print('data arrived')
 		self.twitter_call_limit.append(arg1[0])
 		arg1 = arg1[1:]
 		for x in range(len(arg1)):
 			arg1[x] = arg1[x].get_dict()
-		self.raw_data += arg1
-		self.current_data += arg1
-		self.update_file(self.raw_file_name, self.raw_data)
+		self.current_msgs += arg1
+		raw_name = 'raw_'+ self.name_file(self.topic_name)
+		self.update_file(raw_name, arg1, raw_type=True)
 		self.update_frame()

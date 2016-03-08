@@ -3,6 +3,9 @@ from pubsub import pub
 import json as js
 from publishers.TwitterClient import Client
 from PyQt4 import QtGui, QtCore
+from fscUI.fscEntry import fscEntry              
+from fscUI.fscTab import fscTab 
+from fscUI.fscWindow import fscWindow
 import sys
 import os
 import datetime
@@ -29,14 +32,26 @@ import_all(list(filter(regex.match, os.listdir('publishers')))+[0])
 import_all(list(filter(regex.match, os.listdir('subscribers')))+[1])
 import_all(list(filter(regex.match, os.listdir('messages')))+[2])
 
+def read_file(file):
+		#file = glob.glob(file+'*.json')
+		if(os.path.exists('data/'+file)):
+			with open(os.path.join('data/' , file), encoding='utf-8') as f:
+				try:
+					return js.load(f)
+				except ValueError:
+					print('ValueError')
+		else :
+			print("There is no /data directory available to fsc in the working directory or the required file has been deleted.")
 
+test_data = read_file('raw_trump_2016_03_07_12_14_02.json')
 
 app	= QtGui.QApplication(sys.argv)
 
 tabs = QtGui.QTabWidget()
 app.setActiveWindow(tabs)
 tabs.setWindowTitle("fsc")
-tab = QtGui.QWidget
+tab = QtGui.QWidget()
+fscE = fscEntry(test_data[0])
 
 fun = QtGui.QWidget()
 sub = QtGui.QWidget()
@@ -67,11 +82,12 @@ from pubsub import pub
 # while(True):
 	# pub.sendMessage('please', arg1="find me")
 
-	
+
+
 subbly = subscribers.TwitterSubscriber.TwitterSubscriber('standard', 'trump', sub)
 pubbly = publishers.TwitterPublisher.TwitterPublisher('standard', 'trump')
-print('completed')
-tabs.addTab(sub, 'sub')
+#print('completed')
+tabs.addTab(fscE, 'sub')
 tabs.addTab(fun, 'fun')
 tabs.show()
 

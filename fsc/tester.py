@@ -5,6 +5,7 @@ import publishers
 import subscribers
 import messages
 from PyQt4 import QtGui, QtCore
+from fscUI.fscWindow import fscWindow
 import sys
 import os
 import datetime
@@ -46,5 +47,6 @@ def funfun(arg1):
 	# pub.sendMessage('please', arg1="find me")
 
 app	= QtGui.QApplication(sys.argv)
+
 plubbt = pub.subscribe(funfun, 'trump')
-fscWindow(app)
+window = fscWindow(app)

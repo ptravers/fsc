@@ -45,6 +45,7 @@ class TwitterPublisher:
 		return i
 
 	def puiblish(self):
-		msg = self.get_data(100)
+		msg = self.get_data(5)
+		print('got data')
 		pub.sendMessage(self.search_term, arg1=msg)
 

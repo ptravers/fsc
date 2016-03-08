@@ -2,6 +2,7 @@
 import publishers
 import subscribers
 import messages
+from .fscTab import fscTab
 from PyQt4 import QtGui, QtCore
 import sys
 import os
@@ -14,7 +15,7 @@ class fscWindow(QtGui.QTabWidget):
 		super().__init__()
 		parent.setActiveWindow(self)
 		
-		pubs_n_subs = []
+		self.pubs_n_subs = []
 		
 		self.setWindowTitle('FSC')
 		self.resize(600, 600)
@@ -22,7 +23,7 @@ class fscWindow(QtGui.QTabWidget):
 		self.create_main_tab()
 		self.show()
 
-		sys.exit(app.exec_())
+		sys.exit(parent.exec_())
 
 
 	def create_main_tab(self):

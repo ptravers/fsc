@@ -17,43 +17,33 @@ class fscTab(QtGui.QWidget):
 		self.parent_window = window
 
 		#Will be used when there is the added capacity to open existing files
-		main_tab_layout = QtGui.QVBoxLayout()
-		self.setLayout(main_tab_layout)
+
+		self.main_tab_layout = QtGui.QVBoxLayout()
+		scroll_area = QtGui.QScrollArea()
+		self.setLayout(self.main_tab_layout)
 
 		drop_down = tabDropDown()
 
 
 		self.create_new = QtGui.QWidget(self)
-		main_tab_layout.addWidget(self.create_new)
+		self.main_tab_layout.addWidget(self.create_new)
 		self.create_new_layout =  QtGui.QVBoxLayout()
 		self.create_new_layout.addWidget(drop_down)
-		drop 
 		self.create_new.setLayout(self.create_new_layout)
+		
+		self.scroll = QtGui.QScrollArea()
+		self.scroll.setWidgetResizable(True)
+		self.scroll.setWidget(self.create_new)
+		
+		self.selected_options = QtGui.QWidget(self.create_new)
+		self.create_new_layout.addWidget(self.selected_options)
+		self.selected_options_layout = QtGui.QVBoxLayout()
+		self.selected_options.setLayout(self.selected_options_layout)
 
-
-		# self.selected_options = QtGui.QWidget(self.create_new)
-		# self.create_new_layout.addWidget(self.selected_options)
-		# self.selected_options_layout = QtGui.QHBoxLayout()
-		# self.selected_options.setLayout(self.selected_options_layout)
-
-		# self.publisher_choices_UI = QtGui.QWidget(self.selected_options)
-		# self.publisher_choices_UI_layout = QtGui.QVBoxLayout()
-		# self.publisher_choices_UI.setLayout(self.publisher_choices_UI_layout)
-
-
-
-		# self.subscriber_choices_UI = QtGui.QWidget(self.selected_options)
-		# self.subscriber_choices_UI_layout = QtGui.QVBoxLayout()
-		# self.subscriber_choices_UI.setLayout(self.subscriber_choices_UI_layout)
-		# #move the selected options segment to dropdown
-		# self.selected_options_layout.addWidget(self.subscriber_choices_UI)
-		# self.selected_options_layout.addWidget(self.publisher_choices_UI)
 
 		self.subscriber_choices = sub_choices
 		self.publisher_choices = pub_choices
 
-		self.selected_options_layout.addWidget(self.subscriber_choices_UI)
-		self.selected_options_layout.addWidget(self.publisher_choices_UI)
 
 		drop_down.publisher_menu.activated[str].connect(self.run_publisher)
 		drop_down.subscriber_menu.activated[str].connect(self.run_subscriber)
@@ -65,7 +55,7 @@ class fscTab(QtGui.QWidget):
 			self.create_button.clicked.connect(self.create_and_refresh)
 			self.create_new_layout.addWidget(self.create_button)
 			self.parent_window.addTab(self, "Create Tab")
-
+		
 		self.search_term = search_term
 		self.message_type = message_type
 
@@ -74,14 +64,14 @@ class fscTab(QtGui.QWidget):
 		self.publisher_choices.append(text)
 		temp = QtGui.QLabel()
 		temp.setText(text)
-		self.create_new_layout.addWidget(temp)
+		self.selected_options_layout.addWidget(temp)
 		self.create_new_publisher(text)
 
 	def run_subscriber(self, text):
 		self.subscriber_choices.append(text)
 		temp = QtGui.QLabel()
 		temp.setText(text)
-		self.create_new_layout.addWidget(temp)
+		self.selected_options_layout.addWidget(temp)
 		self.create_new_subscriber(text)
 
 	def create_new_publisher(self, text):
@@ -106,8 +96,8 @@ class fscTab(QtGui.QWidget):
 		self.search_term = self.text_entry.text() #test that this returns None
 		self.message_type = 'standard'
 		if(((self.search_term is not None) or (self.search_term is not '')) and (self.message_type is not None)):
-			for a in reversed(range(self.publisher_choices_UI_layout.count())):
-				w = self.publisher_choices_UI_layout.takeAt(a)
+			for a in reversed(range(self.selected_options_layout.count())):
+				w = self.selected_options_layout.takeAt(a)
 				if w is not None:
 					w = w.widget()
 					w.deleteLater()
@@ -115,3 +105,4 @@ class fscTab(QtGui.QWidget):
 				self.create_new_subscriber(sub)
 			for pubs in self.publisher_choices:
 				self.create_new_publisher(pubs)
+				
