@@ -50,25 +50,40 @@ app	= QtGui.QApplication(sys.argv)
 tabs = QtGui.QTabWidget()
 app.setActiveWindow(tabs)
 tabs.setWindowTitle("fsc")
-tab = QtGui.QWidget()
-fscE = fscEntry(test_data[0])
+tab = QtGui.QWidget(tabs)
+tab_layout = QtGui.QVBoxLayout()
+content = QtGui.QWidget(tab)
+content_layout = QtGui.QVBoxLayout(content)
 
-fun = QtGui.QWidget()
-sub = QtGui.QWidget()
+
+fscE = []
+for x in range(len(test_data)-1): 
+	a = fscEntry(test_data[x])
+	b = QtGui.QLabel(str(x))
+	fscE.append([a,b])
+	content_layout.addWidget(a)
+tab.setLayout(tab_layout)
+
+fun = QtGui.QWidget(tab)
+sub = QtGui.QWidget(tab)
 fun_layout = QtGui.QVBoxLayout()
 fun.setLayout(fun_layout)
 a = QtGui.QLabel(fun)
 a.setText('ahhhhhhh')
 fun_layout.addWidget(a)
+
 for a in range(4):
 	b = QtGui.QLabel(fun)
 	b.setText('yay')
 	fun_layout.addWidget(b)
-
+scroll = QtGui.QScrollArea(tab)
+scroll.setWidget(content)
+scroll.setWidgetResizable(True)
+tab_layout.addWidget(scroll)
 
 text = QtGui.QTextEdit(fun)
 fun_layout.addWidget(text)
-if(text.toPlainText() is not ''):
+if(text.toPlainText() is ''):
 	text.insertHtml('YAAAAAAAAAAAAAY')
 else:
 	text.insertHtml('FUCK')
@@ -84,10 +99,10 @@ from pubsub import pub
 
 
 
-subbly = subscribers.TwitterSubscriber.TwitterSubscriber('standard', 'trump', sub)
-pubbly = publishers.TwitterPublisher.TwitterPublisher('standard', 'trump')
+#subbly = subscribers.TwitterSubscriber.TwitterSubscriber('standard', 'trump', sub)
+#pubbly = publishers.TwitterPublisher.TwitterPublisher('standard', 'trump')
 #print('completed')
-tabs.addTab(fscE, 'sub')
+tabs.addTab(tab, 'sub')
 tabs.addTab(fun, 'fun')
 tabs.show()
 

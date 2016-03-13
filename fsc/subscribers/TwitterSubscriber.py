@@ -22,9 +22,11 @@ class TwitterSubscriber:
 			pass
 		if(self.parent_window):
 			self.data_area = QtGui.QWidget()
-			self.data_area_layout = QtGui.QVBoxLayout()
-			self.data_area.setLayout(self.data_area_layout)
-			self.parent_window.create_new_layout.addWidget(self.data_area)
+			self.data_area_layout = QtGui.QVBoxLayout(self.data_area)
+			self.scroll_area = QtGui.QScrollArea(self.parent_window)
+			self.scroll_area.setWidget(self.data_area)
+			self.scroll_area.setWidgetResizable(True)
+			self.parent_window.main_tab_layout.addWidget(self.scroll_area)
 		#binds the subscriber so that it doesn't get garbage collected before data is retrieved
 		hard_bind = pub.subscribe(self.listener, topic_name)
 

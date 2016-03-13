@@ -8,14 +8,13 @@ API_KEY, API_SECRET = ('5jquzflYqTUNMNqmpdxPUr4Si', 'RE3tNfpjyhNB5IJatzLiDnoonEw
 
 
 class TwitterPublisher:
-	def __init__(self, message, term):
+	def __init__(self, message, term, count = 5):
 		self.client = Client(API_KEY, API_SECRET)
 		self.message_type = message
 		self.search_term = term
-
+		self.count = count
 		self.search_link_base = 'https://api.twitter.com/1.1/search/tweets.json?q='
 		self.link_base = 'https://twitter.com/'
-		print("publisher created")
 		self.puiblish()
 
 	#Get rate limit when the rate limit is less than the count given the system
@@ -45,7 +44,6 @@ class TwitterPublisher:
 		return i
 
 	def puiblish(self):
-		msg = self.get_data(5)
-		print('got data')
+		msg = self.get_data(self.count)
 		pub.sendMessage(self.search_term, arg1=msg)
 

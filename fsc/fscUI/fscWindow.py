@@ -15,7 +15,8 @@ class fscWindow(QtGui.QTabWidget):
 		super().__init__()
 		parent.setActiveWindow(self)
 		
-		self.pubs_n_subs = []
+		self.pubs = []
+		self.subs = []
 		
 		self.setWindowTitle('FSC')
 		self.resize(600, 600)
@@ -28,3 +29,14 @@ class fscWindow(QtGui.QTabWidget):
 
 	def create_main_tab(self):
 		fscTab(self)
+		
+	def run(self):
+		self.run_publishers()
+		
+	def run_publishers(self):
+		for pub in pubs:
+			pub.publish()
+	
+	def run_subscribers(self):
+		for sub in subs:
+			sub.update_frame()

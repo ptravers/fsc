@@ -17,9 +17,7 @@ class fscTab(QtGui.QWidget):
 		self.parent_window = window
 
 		#Will be used when there is the added capacity to open existing files
-
 		self.main_tab_layout = QtGui.QVBoxLayout()
-		scroll_area = QtGui.QScrollArea()
 		self.setLayout(self.main_tab_layout)
 
 		drop_down = tabDropDown()
@@ -30,16 +28,12 @@ class fscTab(QtGui.QWidget):
 		self.create_new_layout =  QtGui.QVBoxLayout()
 		self.create_new_layout.addWidget(drop_down)
 		self.create_new.setLayout(self.create_new_layout)
-		
-		self.scroll = QtGui.QScrollArea()
-		self.scroll.setWidgetResizable(True)
-		self.scroll.setWidget(self.create_new)
-		
+
+
 		self.selected_options = QtGui.QWidget(self.create_new)
 		self.create_new_layout.addWidget(self.selected_options)
 		self.selected_options_layout = QtGui.QVBoxLayout()
 		self.selected_options.setLayout(self.selected_options_layout)
-
 
 		self.subscriber_choices = sub_choices
 		self.publisher_choices = pub_choices
@@ -51,11 +45,17 @@ class fscTab(QtGui.QWidget):
 		if(search_term == None):
 			self.text_entry = QtGui.QLineEdit(self.create_new)
 			self.create_new_layout.addWidget(self.text_entry)
+			
 			self.create_button = QtGui.QPushButton("Create", self.create_new)
 			self.create_button.clicked.connect(self.create_and_refresh)
 			self.create_new_layout.addWidget(self.create_button)
+			
 			self.parent_window.addTab(self, "Create Tab")
-		
+		else:
+			save_button = QtGui.QPushButton("Save", drop_down)
+			drop_down.layout.addWidget(save_button)
+			save_button.clicked.connect(self.parent_window.run_subscribers())
+
 		self.search_term = search_term
 		self.message_type = message_type
 
@@ -79,7 +79,7 @@ class fscTab(QtGui.QWidget):
 			pub = getattr(publishers, text)
 			pub = getattr(pub, text)
 			temp_pub = pub(self.message_type, self.search_term)
-			self.parent_window.pubs_n_subs.append(temp_pub)
+			self.parent_window.pubs.append(temp_pub)
 
 	def create_new_subscriber(self, text):
 		if(not((self.search_term == None) or (self.message_type == None))):
@@ -88,7 +88,7 @@ class fscTab(QtGui.QWidget):
 			new_tab = fscTab(self.parent_window, self.search_term, self.message_type, self.subscriber_choices,self.publisher_choices)
 			self.parent_window.addTab(new_tab, self.search_term+" "+text)
 			temp_sub = sub(self.message_type, self.search_term, new_tab)
-			self.parent_window.pubs_n_subs.append(temp_sub)
+			self.parent_window.subs.append(temp_sub)
 
 
 
@@ -105,4 +105,5 @@ class fscTab(QtGui.QWidget):
 				self.create_new_subscriber(sub)
 			for pubs in self.publisher_choices:
 				self.create_new_publisher(pubs)
+			self.text_entry.setText('')
 				
