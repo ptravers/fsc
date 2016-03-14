@@ -16,7 +16,8 @@ class fscEntry(QtGui.QWidget):
 		self.populate_output(self.data)
 
 	def get_input_data(self):
-		self.input_box.toPlainText()
+		output = self.input_box.text()
+		return output
 	
 	def populate_output(self, data_dict):
 		if isinstance(data_dict, dict):
@@ -36,7 +37,8 @@ class fscEntry(QtGui.QWidget):
 						#temp.setLineWrapMode(QtGui.QTextEdit.NoWrap)
 						#temp.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
 						temp.setReadOnly(False) if (key == 'node') else temp.setReadOnly(True)
-						self.input_box = temp if (key == 'node') else None
+						if (key == 'node'):
+							self.input_box = temp
 						temp.setText(data_dict[key])
 					else :
 						temp = QtGui.QLabel(self)

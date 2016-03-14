@@ -34,9 +34,9 @@ class fscWindow(QtGui.QTabWidget):
 		self.run_publishers()
 		
 	def run_publishers(self):
-		for pub in pubs:
+		for pub in self.pubs:
 			pub.publish()
 	
 	def run_subscribers(self):
-		for sub in subs:
+		for sub in self.subs:
 			sub.update_frame()

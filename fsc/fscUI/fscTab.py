@@ -54,7 +54,7 @@ class fscTab(QtGui.QWidget):
 		else:
 			save_button = QtGui.QPushButton("Save", drop_down)
 			drop_down.layout.addWidget(save_button)
-			save_button.clicked.connect(self.parent_window.run_subscribers())
+			save_button.clicked.connect(self.parent_window.run_subscribers)
 
 		self.search_term = search_term
 		self.message_type = message_type

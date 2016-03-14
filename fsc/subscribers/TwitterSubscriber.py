@@ -39,10 +39,6 @@ class TwitterSubscriber:
 				element = fscEntry(datum)
 				self.UI_msgs.append(element)
 				self.data_area_layout.addWidget(element)
-			
-				
-				
-				
 	
 	#get_data_from_UI iterates over a list of input QtextEdit widgets
 	#then retrieves whatever is currently written in them
@@ -50,7 +46,9 @@ class TwitterSubscriber:
 	def get_data_from_UI(self):
 		output_areas = []
 		for box in self.UI_msgs:
-			output_areas.append(box.get_input_data())
+			s = box.get_input_data()
+			print(s)
+			output_areas.append(s)
 		return output_areas
 
 	#read_file will load  a file provided it is non empty
@@ -64,7 +62,7 @@ class TwitterSubscriber:
 				try:
 					return js.load(f)
 				except ValueError:
-					print('ValueError')
+					print('ValueError this files is empty or not in the correct json structure')
 		else :
 			print("There is no /data directory available to fsc in the working directory or the required file has been deleted.")
 
