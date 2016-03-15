@@ -1,5 +1,5 @@
 # fsc
-Social Media Project Tool
+Social Media Project Tool v 0.1.0
 
 The project is currently in beta and highly breakable.
 
@@ -32,8 +32,10 @@ Please install one of the following dependent on your system:
 
 This should apply for any OS.
 
-Navigate to directory containing setup.py and fscrape main folder.
-
 ```
  pip3 install pypubsub
 ```
+
+##Run Application
+
+Instructions forth coming.
