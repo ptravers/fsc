@@ -34,7 +34,6 @@ class tabDropDown(QtGui.QWidget):
 
 	def add_items_to_menu(self, items, menu):
 		for x in range(0, len(items)):
-			print(items[x])
 			if os.name == 'nt':
 				b = items[x].split('\\')[1].split('.')[0]
 			else:
