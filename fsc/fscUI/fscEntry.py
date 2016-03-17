@@ -23,15 +23,27 @@ class fscEntry(QtGui.QWidget):
 		if isinstance(data_dict, dict):
 			for key in data_dict.keys():
 			#checks if the element being added is a list or a string/int to avoid type problems
+				entry = QtGui.QWidget(self)
+				entry_layout = QtGui.QHBoxLayout()
+				entry.setLayout(entry_layout)
+				entry_label = QtGui.QLabel(self)
+				entry_label.setText(key)
+				entry_layout.addWidget(entry_label)
 				if isinstance(data_dict[key], list):
-					pass
+						text = ""
+						widget = QtGui.QLabel(self)
+						if key == 'mentions':
+							for x in data_dict[key]:
+								text += x['screen_name'] + " : " + x['id_str'] + ", "
+						elif key == 'hashtags':
+							for x in data_dict[key]:
+								text += x['text'] + ", "
+						widget.setText(text)
+						entry_layout.addWidget(widget)
+						self.data_layout.addWidget(entry)
+						self.output_items.append([widget, entry])
+						
 				else:
-					entry = QtGui.QWidget(self)
-					entry_layout = QtGui.QHBoxLayout()
-					entry.setLayout(entry_layout)
-					entry_label = QtGui.QLabel(self)
-					entry_label.setText(key)
-					entry_layout.addWidget(entry_label)
 					if(key == 'node' or key == 'comment'):
 						temp = QtGui.QLineEdit(self)
 						#temp.setLineWrapMode(QtGui.QTextEdit.NoWrap)

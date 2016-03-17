@@ -28,17 +28,19 @@ class TwitterPublisher:
 		for x in range(len(output.get('statuses'))):
 			msg = StandardMessage()
 			msg.mentions = output.get('statuses')[x]['entities']['user_mentions']
-			msg.id = output.get('statuses')[0]['id_str']
+			msg.id = output.get('statuses')[x]['id_str']
 			msg.shares = str(output.get('statuses')[x]['retweet_count'])
 			msg.likes = str(output.get('statuses')[x]['favorite_count'])
 			msg.hashtags = output.get('statuses')[x]['entities']['hashtags']
 			msg.url = self.link_base + output.get('statuses')[x]['user']['screen_name'] + '/status/' + msg.id
 			msg.comment = str(output.get('statuses')[x]['text'])
-			output.get('statuses')[x]['text']
+			msg.followers = str(output.get('statuses')[x]['user']['followers_count'])
+			msg.following = str(output.get('statuses')[x]['user']['friends_count'])
 			msg.shared = str(output.get('statuses')[x]['retweeted'])
 			msg_array.append(msg)
 		return msg_array
-
+	
+	
 	def get_rate(self):
 		i = self.client.rate_limit_status()['resources']['search']
 		return i

@@ -39,6 +39,9 @@ class TwitterSubscriber:
 				element = fscEntry(datum)
 				self.UI_msgs.append(element)
 				self.data_area_layout.addWidget(element)
+		else:
+			self.update_file(self.file_name, self.current_msgs)
+			self.current_msgs = self.read_file(self.file_name)
 	
 	#get_data_from_UI iterates over a list of input QtextEdit widgets
 	#then retrieves whatever is currently written in them
@@ -91,7 +94,6 @@ class TwitterSubscriber:
 		return str(primary_name) + "_" + str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":","_").split(".")[0] + ".json"
 
 	def listener(self, arg1):
-		print('data arrived')
 		self.twitter_call_limit.append(arg1[0])
 		arg1 = arg1[1:]
 		for x in range(len(arg1)):
