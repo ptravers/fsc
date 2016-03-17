@@ -50,7 +50,6 @@ class TwitterSubscriber:
 		output_areas = []
 		for box in self.UI_msgs:
 			s = box.get_input_data()
-			print(s)
 			output_areas.append(s)
 		return output_areas
 
