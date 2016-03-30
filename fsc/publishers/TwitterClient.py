@@ -1,3 +1,8 @@
+#The below was sourced from https://github.com/pabluk/twitter-application-only-auth
+# I have included it in this application for ease of distribution.
+# I do not claim any ownership or authorship
+# Please contact me if you would like it removed.
+
 #!/usr/bin/python
 import base64
 import json
