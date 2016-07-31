@@ -38,4 +38,4 @@ This should apply for any OS.
 
 ##Run Application
 
-Instructions forth coming.
+Please find instructions in Wiki
