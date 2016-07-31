@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/ptravers/fsc.png?label=ready&title=Ready)](https://waffle.io/ptravers/fsc)
 # fsc
 Social Media Project Tool v 0.1.0
 
