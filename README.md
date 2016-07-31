@@ -13,7 +13,7 @@ The project is licenced under the GPLv3 licence. No support is provided.
 
 ###Step One
 
-####Linux/OSX
+####Linux
 
 Please run the following command in a bash terminal
 ```bash
